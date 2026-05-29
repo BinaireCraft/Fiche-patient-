@@ -1,68 +1,1624 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TRINITY HEALTH CARE | Espace patients</title>
-  <meta name="description" content="Espace sécurisé de suivi des patients et de l’historique des consultations." />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>TRINITY HEALTH CARE - Gestion des dossiers patients</title>
+  <meta name="description" content="Espace sécurisé de gestion interne des dossiers patients de TRINITY HEALTH CARE.">
   <style>
-    :root{
-      --ink:#10242b;--muted:#65777d;--line:rgba(16,36,43,.12);--bg:#f6fafb;--panel:#ffffff;
-      --primary:#075f73;--primary-2:#0b8faf;--deep:#042f3a;--soft:#eaf7fa;--danger:#b42318;--ok:#087443;
-      --shadow:0 24px 70px rgba(8,51,63,.12);--shadow2:0 12px 35px rgba(8,51,63,.08);--radius:26px;
+    :root {
+      --bg: #f4f8fb;
+      --panel: #ffffff;
+      --primary: #075e65;
+      --primary-dark: #04434b;
+      --accent: #0e8d84;
+      --text: #13252f;
+      --muted: #667985;
+      --line: #dce8ee;
+      --danger: #a83232;
+      --success: #1f7a45;
+      --warning: #9a6500;
+      --shadow: 0 20px 50px rgba(8, 52, 64, 0.12);
+      --radius: 22px;
     }
-    *{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth} body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55} button,input,textarea,select{font:inherit} button{cursor:pointer} textarea{resize:vertical;min-height:120px}
-    .shell{width:min(1180px,calc(100% - 32px));margin:auto}.topbar{position:sticky;top:0;z-index:50;background:rgba(246,250,251,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:12px;color:var(--deep);font-weight:900;text-decoration:none;letter-spacing:.3px}.mark{width:46px;height:46px;border-radius:18px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;display:grid;place-items:center;box-shadow:0 14px 34px rgba(7,95,115,.24)}.brand small{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:0;margin-top:-2px}
-    .menu{display:flex;align-items:center;gap:8px}.menu button{border:0;background:transparent;color:var(--ink);font-weight:800;padding:11px 14px;border-radius:999px}.menu button:hover,.menu button.active{background:var(--soft);color:var(--primary)}.login-btn{background:var(--primary)!important;color:white!important;box-shadow:0 14px 30px rgba(7,95,115,.22)}.logout-btn{display:none;background:#fff1ef!important;color:var(--danger)!important}body.is-authenticated .logout-btn{display:inline-flex}body.is-authenticated .login-btn{display:none}.mobile{display:none;border:0;background:white;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-weight:900;color:var(--deep)}
-    .page{display:none;min-height:calc(100vh - 76px)}.page.active{display:block;animation:rise .28s ease both}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .hero{position:relative;min-height:560px;display:flex;align-items:center;overflow:hidden;isolation:isolate;background-size:cover;background-position:center}.hero:before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(4,33,40,.94),rgba(4,33,40,.68),rgba(4,33,40,.2))}.hero:after{content:"";position:absolute;inset:auto -12% -42% auto;width:620px;height:620px;border-radius:999px;background:rgba(44,190,217,.18);filter:blur(8px);z-index:-1}.home{background-image:url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1800&q=82')}.privacy{background-image:url('https://images.unsplash.com/photo-1551190822-a9333d879b1f?auto=format&fit=crop&w=1800&q=82')}.login{background-image:url('https://images.unsplash.com/photo-1581093458791-9f3c3900df7b?auto=format&fit=crop&w=1800&q=82');min-height:calc(100vh - 76px)}.dashHero{background-image:url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=82');min-height:430px}
-    .heroGrid{display:grid;grid-template-columns:1.08fr .92fr;gap:36px;align-items:center;padding:78px 0;color:white}.kicker{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.11);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;margin-bottom:20px}.hero h1{font-size:clamp(38px,6vw,70px);line-height:1;letter-spacing:-2.3px;margin-bottom:22px}.hero p{font-size:clamp(16px,2vw,19px);color:rgba(255,255,255,.86);max-width:620px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.btn{border:0;border-radius:999px;padding:14px 18px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:10px;transition:.2s ease}.btn:hover{transform:translateY(-2px)}.btn.white{background:white;color:var(--deep);box-shadow:0 18px 38px rgba(0,0,0,.16)}.btn.ghost{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.24);color:white}.btn.soft{background:var(--soft);border:1px solid var(--line);color:var(--deep)}.btn.danger{background:#fff1ef;color:var(--danger);border:1px solid rgba(180,35,24,.18)}
-    .glass,.panel,.card{border:1px solid rgba(255,255,255,.62);background:rgba(255,255,255,.94);border-radius:var(--radius);box-shadow:var(--shadow);color:var(--ink)}.glass{padding:28px}.glass h2,.panel h3{font-size:26px;color:var(--deep);margin-bottom:8px}.glass p,.panel p{color:var(--muted);font-size:15px;margin-bottom:18px}.steps{display:grid;gap:12px}.step{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:20px;background:#f8fcfd}.num{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;display:grid;place-items:center;font-weight:900;flex:0 0 auto}.step strong{display:block;color:var(--deep);margin-bottom:2px}.step span{font-size:14px;color:var(--muted)}
-    .section{padding:76px 0}.head{max-width:820px;margin-bottom:34px}.tag{color:var(--primary);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1.35px;margin-bottom:10px}.head h2{font-size:clamp(28px,4vw,46px);line-height:1.08;letter-spacing:-1.1px;color:var(--deep);margin-bottom:12px}.head p{color:var(--muted);font-size:17px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{padding:24px;box-shadow:var(--shadow2);background:white}.card h3{font-size:22px;color:var(--deep);margin-bottom:8px}.card p{font-size:15px;color:var(--muted)}
-    .loginGrid{display:grid;grid-template-columns:.9fr 1.1fr;gap:34px;align-items:center;padding:76px 0;color:white}.panel{padding:28px;background:white;box-shadow:var(--shadow2);border-color:var(--line)}.form{display:grid;gap:15px}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:13px;font-weight:900;color:var(--deep);margin-bottom:7px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:16px;background:#fbfeff;color:var(--ink);padding:14px 15px;outline:none}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(11,143,175,.12)}.pass{position:relative}.pass button{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:var(--soft);color:var(--primary);font-size:13px;font-weight:900;border-radius:999px;padding:8px 12px}.submit{border:0;width:100%;border-radius:999px;padding:15px 18px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:white;font-weight:900;box-shadow:0 18px 36px rgba(7,95,115,.22)}.submit:disabled{opacity:.62;cursor:not-allowed}.notice{display:none;margin-top:14px;border-radius:18px;padding:13px 14px;background:var(--soft);border:1px solid var(--line);font-size:14px;color:var(--deep)}.notice.show{display:block}.notice.error{background:#fff1ef;color:var(--danger);border-color:rgba(180,35,24,.18)}.notice.ok{background:#ecfdf3;color:var(--ok);border-color:rgba(8,116,67,.17)}.notice.warn{background:#fffaeb;color:#9a6700;border-color:rgba(154,103,0,.18)}
-    .profileLine{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}.profileLine span{color:var(--muted)}.profileLine strong{text-align:right;color:var(--deep);word-break:break-word}.badge{display:inline-flex;padding:8px 12px;border-radius:999px;background:#ecfdf3;color:var(--ok);border:1px solid rgba(8,116,67,.16);font-size:13px;font-weight:900;margin-bottom:16px}
-    .workspace{display:grid;grid-template-columns:.92fr 1.08fr;gap:20px;align-items:start}.panel.hidden{display:none}.search{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}.results,.history{display:grid;gap:14px;margin-top:18px}.result{border:1px solid var(--line);background:#fbfeff;border-radius:22px;padding:18px}.result h4{font-size:22px;color:var(--deep);margin-bottom:10px}.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}.meta div{border:1px solid var(--line);background:#f8fcfd;border-radius:16px;padding:12px}.meta span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:900;margin-bottom:4px}.meta strong{color:var(--deep);word-break:break-word}.patientActions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.selected{background:#f4fbfd;border:1px solid var(--line);border-radius:18px;padding:14px;color:var(--deep);font-weight:900;margin-bottom:15px}.consult{border:1px solid var(--line);border-radius:22px;background:white;padding:18px}.consult header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.consult h5{font-size:19px;color:var(--deep)}.consult small{color:var(--muted);font-weight:800}.summary{white-space:pre-wrap;background:#f8fcfd;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;color:var(--ink)}
-    footer{background:var(--deep);color:rgba(255,255,255,.82);padding:28px 0}.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:14px}
-    @media(max-width:920px){.mobile{display:inline-flex}.menu{position:absolute;top:86px;left:16px;right:16px;display:none;flex-direction:column;align-items:stretch;background:white;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:var(--shadow)}.menu.open{display:flex}.menu button{text-align:left}.heroGrid,.loginGrid,.workspace{grid-template-columns:1fr}.hero{min-height:auto}.hero:before{background:linear-gradient(180deg,rgba(4,33,40,.94),rgba(4,33,40,.72))}.cards,.row,.meta{grid-template-columns:1fr}.search{grid-template-columns:1fr}.glass,.panel{padding:22px}.section{padding:56px 0}}
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    body.lock-scroll {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 6vw;
+      background: rgba(255, 255, 255, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      min-width: 0;
+    }
+
+    .brand span:last-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+    }
+
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .nav-login {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 28px;
+      min-height: 72vh;
+      padding: 80px 6vw;
+      align-items: center;
+      background:
+        linear-gradient(135deg, rgba(7, 94, 101, 0.91), rgba(4, 67, 75, 0.87)),
+        url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1800&q=80') center/cover;
+      color: #fff;
+    }
+
+    .hero-content {
+      max-width: 760px;
+    }
+
+    .kicker {
+      display: inline-block;
+      margin-bottom: 14px;
+      color: var(--accent);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+    }
+
+    .hero .kicker {
+      color: #b9fff7;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.1rem, 5vw, 4.8rem);
+      line-height: 1.02;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(1.45rem, 2.5vw, 2.2rem);
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+    }
+
+    .hero-content p {
+      max-width: 640px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 1.08rem;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(7, 94, 101, 0.22);
+    }
+
+    .btn-secondary {
+      background: #eaf4f5;
+      color: var(--primary-dark);
+    }
+
+    .btn-danger {
+      background: #fae8e8;
+      color: var(--danger);
+    }
+
+    .hero .btn-secondary {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+    }
+
+    .btn-small {
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .hero-panel,
+    .login-card,
+    .info-card,
+    .panel,
+    .stat-card,
+    .patient-card {
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel {
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(18px);
+    }
+
+    .clean-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .clean-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .section {
+      padding: 72px 6vw;
+    }
+
+    .section-heading {
+      max-width: 800px;
+      margin-bottom: 30px;
+    }
+
+    .section-heading p,
+    .info-card p,
+    .page-head p,
+    .patient-card p,
+    .small-text,
+    .muted {
+      color: var(--muted);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .info-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .login-section {
+      padding: 40px 6vw 84px;
+    }
+
+    .login-card {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1.1fr);
+      gap: 30px;
+      align-items: start;
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 32px;
+      border: 1px solid var(--line);
+    }
+
+    .form-card,
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.94rem;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(14, 141, 132, 0.12);
+    }
+
+    .password-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .password-row button {
+      border: 0;
+      border-radius: 14px;
+      padding: 0 14px;
+      background: #eaf4f5;
+      color: var(--primary-dark);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .notice {
+      min-height: 22px;
+      padding: 10px 0 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .notice.success {
+      color: var(--success);
+    }
+
+    .notice.error {
+      color: var(--danger);
+    }
+
+    .footer {
+      padding: 24px 6vw;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+      background: #062e34;
+      color: #fff;
+      overflow-y: auto;
+    }
+
+    .admin-brand .brand-mark {
+      background: #fff;
+      color: var(--primary-dark);
+    }
+
+    .side-nav {
+      display: grid;
+      gap: 10px;
+    }
+
+    .side-nav button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.72);
+      text-align: left;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .side-nav button.active,
+    .side-nav button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .user-box {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .user-box span {
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    .admin-main {
+      padding: 34px;
+      min-width: 0;
+    }
+
+    .mobile-admin-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      padding: 12px 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .app-view {
+      display: none;
+      animation: fadeUp 0.25s ease both;
+    }
+
+    .app-view.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .page-head {
+      margin-bottom: 24px;
+    }
+
+    .page-head h1 {
+      color: var(--text);
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      margin-bottom: 10px;
+    }
+
+    .split-head,
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .stat-card span {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat-card strong {
+      font-size: 2.4rem;
+      color: var(--primary-dark);
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      margin-bottom: 22px;
+    }
+
+    .list-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .patient-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .patient-line span {
+      font-weight: 800;
+    }
+
+    .patient-line small {
+      color: var(--muted);
+    }
+
+    .search-box {
+      margin-bottom: 18px;
+    }
+
+    .patients-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .patient-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid var(--line);
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: #eaf4f5;
+      color: var(--primary-dark);
+      font-weight: 900;
+    }
+
+    .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid h2,
+    .wide,
+    .notice.wide {
+      grid-column: 1 / -1;
+    }
+
+    .actions-end {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .details-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .details-grid div {
+      display: grid;
+      grid-template-columns: minmax(140px, 0.45fr) 1fr;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .details-grid strong {
+      color: var(--primary-dark);
+    }
+
+    .details-grid span {
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .timeline-date {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eaf4f5;
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      color: var(--muted);
+      background: #fff;
+    }
+
+    .config-warning {
+      display: none;
+      margin: 16px 6vw 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid #f3d19c;
+      color: var(--warning);
+      background: #fff7e8;
+      font-weight: 700;
+    }
+
+    .config-warning.active {
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .login-card,
+      .app-shell,
+      .file-grid,
+      .stats-grid,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topnav {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 50;
+        inset: 0 auto 0 0;
+        width: min(300px, 82vw);
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .mobile-admin-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .admin-main {
+        padding: 18px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .hero,
+      .section,
+      .login-section {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .topbar {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .form-grid,
+      .patient-card {
+        grid-template-columns: 1fr;
+      }
+
+      .details-grid div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .split-head,
+      .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
-<header class="topbar"><nav class="nav shell"><a class="brand" href="#" data-page="home"><span class="mark">TH</span><span>TRINITY HEALTH CARE<small>Espace patients</small></span></a><button class="mobile" id="mobileToggle" type="button">Menu</button><div class="menu" id="mainMenu"><button class="active" type="button" data-page="home">Accueil</button><button type="button" data-page="privacy">Confidentialité</button><button class="login-btn" type="button" data-page="login">Se connecter</button><button class="logout-btn" id="logoutButton" type="button">Déconnexion</button></div></nav></header>
-<main>
-<section class="page active" id="home"><div class="hero home"><div class="heroGrid shell"><div><span class="kicker">Dossiers patients et suivi des consultations</span><h1>Un historique clair pour chaque passage du patient.</h1><p>Une fiche patient conserve les informations générales. À chaque nouvelle visite, une consultation est ajoutée sans effacer les précédentes.</p><div class="actions"><button class="btn white" type="button" data-page="login">Accéder à l’espace sécurisé</button><button class="btn ghost" type="button" data-page="privacy">Règles d’accès</button></div></div><aside class="glass"><h2>Organisation du suivi</h2><p>Le dossier reste lisible, traçable et simple à consulter par le personnel autorisé.</p><div class="steps"><div class="step"><span class="num">1</span><div><strong>Fiche unique</strong><span>Nom, contact, date de naissance et adresse.</span></div></div><div class="step"><span class="num">2</span><div><strong>Consultations successives</strong><span>Chaque passage est enregistré séparément.</span></div></div><div class="step"><span class="num">3</span><div><strong>Traçabilité</strong><span>Date, praticien consulté et personne ayant enregistré.</span></div></div></div></aside></div></div><section class="section shell"><div class="head"><div class="tag">Principe de fonctionnement</div><h2>On n’écrase pas l’ancien résumé. On ajoute une nouvelle consultation.</h2><p>Cela permet de relire les précédentes observations et de mieux orienter le patient lors de ses prochains passages.</p></div><div class="cards"><article class="card"><h3>Créer la fiche</h3><p>Les informations générales sont enregistrées une seule fois, puis corrigées uniquement si nécessaire.</p></article><article class="card"><h3>Ajouter un passage</h3><p>Chaque consultation reçoit sa propre date, son résumé et le nom du praticien.</p></article><article class="card"><h3>Consulter l’historique</h3><p>Le personnel autorisé retrouve rapidement les anciennes consultations du patient.</p></article></div></section></section>
-<section class="page" id="privacy"><div class="hero privacy"><div class="heroGrid shell"><div><span class="kicker">Confidentialité et responsabilité</span><h1>Chaque accès doit correspondre au rôle de la personne connectée.</h1><p>Les anciennes consultations restent conservées. Les corrections concernent uniquement les informations générales du patient.</p><div class="actions"><button class="btn white" type="button" data-page="login">Se connecter</button></div></div><aside class="glass"><h2>Statuts d’accès</h2><div class="steps"><div class="step"><span class="num">A</span><div><strong>Administrateur</strong><span>Gestion complète et correction des dossiers.</span></div></div><div class="step"><span class="num">M</span><div><strong>Accès modification</strong><span>Création de fiches et ajout de consultations.</span></div></div><div class="step"><span class="num">C</span><div><strong>Accès consultation</strong><span>Lecture et recherche uniquement.</span></div></div></div></aside></div></div></section>
-<section class="page" id="login"><div class="hero login"><div class="loginGrid shell"><div><span class="kicker">Accès réservé au personnel autorisé</span><h1>Connexion à l’espace patients.</h1><p>Entrez vos identifiants pour accéder aux fonctionnalités attribuées à votre statut.</p></div><div class="panel"><h3>Se connecter</h3><p>L’accès est réservé aux utilisateurs autorisés par l’administration.</p><form class="form" id="loginForm"><div class="field"><label for="email">Adresse email</label><input id="email" type="email" placeholder="votre@email.com" required></div><div class="field"><label for="password">Mot de passe</label><div class="pass"><input id="password" type="password" placeholder="Votre mot de passe" required minlength="6"><button type="button" id="togglePassword">Voir</button></div></div><button class="submit" id="loginSubmit" type="submit">Connexion</button><div class="notice" id="loginNotice"></div></form></div></div></div></section>
-<section class="page" id="dashboard"><div class="hero dashHero"><div class="heroGrid shell"><div><span class="kicker">Espace connecté</span><h1 id="dashboardTitle">Bienvenue dans votre espace sécurisé.</h1><p id="dashboardSubtitle">Votre accès est actif. Utilisez les fonctionnalités disponibles selon votre statut.</p><div class="actions"><button class="btn white" type="button" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">Ouvrir les dossiers patients</button></div></div><aside class="glass"><span class="badge" id="profileBadge">Accès autorisé</span><h2 id="profileGreeting">Bonjour</h2><p id="profileAccessText">Votre statut vous permet d’accéder à l’espace sécurisé.</p><div class="profileLine"><span>Email</span><strong id="userEmail">Non disponible</strong></div><div class="profileLine"><span>Nom</span><strong id="userName">Non configuré</strong></div><div class="profileLine"><span>Statut</span><strong id="userRole">Non configuré</strong></div><button class="btn soft" id="dashboardLogout" type="button" style="width:100%;margin-top:18px">Se déconnecter</button></aside></div></div><section class="section shell" id="workspace"><div class="head"><div class="tag">Dossiers patients</div><h2>Créer une fiche, rechercher un patient et ajouter ses consultations.</h2><p id="patientPermissionText">Les fonctionnalités disponibles dépendent de votre statut.</p></div><div class="workspace"><div><div class="panel" id="patientFormPanel"><h3 id="patientFormTitle">Créer une fiche patient</h3><p id="patientFormDescription">Enregistrez les informations générales. Les consultations seront ajoutées dans l’historique.</p><form class="form" id="patientForm"><input type="hidden" id="editingPatientId"><div class="field"><label for="patientName">Nom complet du patient</label><input id="patientName" type="text" placeholder="Nom et post-nom" required></div><div class="row"><div class="field"><label for="birthDate">Date de naissance</label><input id="birthDate" type="date"></div><div class="field"><label for="gender">Sexe</label><select id="gender"><option value="">Non précisé</option><option value="Féminin">Féminin</option><option value="Masculin">Masculin</option></select></div></div><div class="row"><div class="field"><label for="phone">Téléphone</label><input id="phone" type="tel" placeholder="+243 ..."></div><div class="field"><label for="address">Adresse</label><input id="address" type="text" placeholder="Commune, quartier ou référence"></div></div><button class="submit" id="patientSubmit" type="submit">Enregistrer la fiche</button><button class="btn soft" id="cancelPatientEdit" type="button" style="display:none">Annuler la correction</button><div class="notice" id="patientNotice"></div></form></div><div class="panel hidden" id="consultationFormPanel" style="margin-top:20px"><h3>Ajouter une consultation</h3><p>Ajoutez le résumé du nouveau passage. Les anciennes consultations restent conservées.</p><div class="selected" id="selectedPatientLabel">Aucun patient sélectionné</div><form class="form" id="consultationForm"><input type="hidden" id="consultationPatientId"><div class="row"><div class="field"><label for="consultationDate">Date de consultation</label><input id="consultationDate" type="date" required></div><div class="field"><label for="doctorName">Docteur ou praticien consulté</label><input id="doctorName" type="text" placeholder="Nom du praticien" required></div></div><div class="field"><label for="consultationSummary">Résumé de la consultation</label><textarea id="consultationSummary" placeholder="Diagnostic, observation, recommandation ou référence..." required></textarea></div><button class="submit" id="consultationSubmit" type="submit">Ajouter la consultation</button><div class="notice" id="consultationNotice"></div></form></div></div><div class="panel"><h3>Rechercher une fiche</h3><p>Entrez le nom du patient pour ouvrir son dossier et consulter l’historique.</p><div class="search"><div class="field"><label for="patientSearch">Nom du patient</label><input id="patientSearch" type="search" placeholder="Exemple : Kalala, Rebecca, Rolly..."></div><button class="submit" id="searchButton" type="button">Rechercher</button></div><div class="notice" id="searchNotice"></div><div class="results" id="patientResults"></div><div class="panel hidden" id="patientDetailsPanel" style="margin-top:20px;box-shadow:none"><h3 id="detailsPatientName">Dossier patient</h3><div id="detailsPatientInfo"></div><div class="patientActions" id="detailsActions"></div><h3 style="margin-top:24px">Historique des consultations</h3><div class="history" id="consultationList"></div></div></div></div></section></section>
-</main><footer><div class="foot shell"><p>TRINITY HEALTH CARE - Espace patients</p><p>Accès réservé au personnel autorisé</p></div></footer>
-<script>
-const SUPABASE_URL="https://nfuoquwrcmgrrnoysonq.supabase.co";const SUPABASE_PUBLISHABLE_KEY="sb_publishable_lB-bqm72w31U6b-xlt4xCQ_0_ACTd8A";
-const isConfigured=SUPABASE_URL.startsWith("https://")&&SUPABASE_URL.includes(".supabase.co")&&!SUPABASE_URL.includes("REMPLACE_ICI")&&!SUPABASE_PUBLISHABLE_KEY.includes("REMPLACE_ICI");const supabaseClient=isConfigured?supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
-const $=id=>document.getElementById(id);const pages=document.querySelectorAll('.page'),navButtons=document.querySelectorAll('[data-page]');const mainMenu=$('mainMenu'),mobileToggle=$('mobileToggle'),loginForm=$('loginForm'),loginNotice=$('loginNotice'),loginSubmit=$('loginSubmit'),togglePassword=$('togglePassword'),passwordInput=$('password'),logoutButton=$('logoutButton'),dashboardLogout=$('dashboardLogout');
-const userEmail=$('userEmail'),userName=$('userName'),userRole=$('userRole'),profileGreeting=$('profileGreeting'),profileAccessText=$('profileAccessText'),profileBadge=$('profileBadge'),dashboardTitle=$('dashboardTitle'),dashboardSubtitle=$('dashboardSubtitle');
-const patientFormPanel=$('patientFormPanel'),patientForm=$('patientForm'),patientNotice=$('patientNotice'),patientSubmit=$('patientSubmit'),patientFormTitle=$('patientFormTitle'),patientFormDescription=$('patientFormDescription'),editingPatientId=$('editingPatientId'),cancelPatientEdit=$('cancelPatientEdit'),patientPermissionText=$('patientPermissionText');
-const consultationFormPanel=$('consultationFormPanel'),consultationForm=$('consultationForm'),consultationPatientId=$('consultationPatientId'),selectedPatientLabel=$('selectedPatientLabel'),consultationNotice=$('consultationNotice'),consultationSubmit=$('consultationSubmit');
-const patientSearch=$('patientSearch'),searchButton=$('searchButton'),searchNotice=$('searchNotice'),patientResults=$('patientResults'),patientDetailsPanel=$('patientDetailsPanel'),detailsPatientName=$('detailsPatientName'),detailsPatientInfo=$('detailsPatientInfo'),detailsActions=$('detailsActions'),consultationList=$('consultationList');
-let currentUser=null,currentProfile=null,lastPatientResults=[],selectedPatient=null;const roleLabels={admin:'Administrateur',modification:'Accès modification',consultation:'Accès consultation'};const roleDescriptions={admin:'Votre statut permet de créer des fiches, corriger les informations générales et ajouter les consultations.',modification:'Votre statut permet de créer des fiches, corriger les informations générales et ajouter les consultations.',consultation:'Votre statut permet de rechercher et consulter les dossiers patients.'};
-function canManagePatients(){return currentProfile&&['admin','modification'].includes(currentProfile.role)}function roleName(r){return roleLabels[r]||'Accès non défini'}function note(el,msg,type='warn'){el.textContent=msg;el.className='notice show '+type}function clearNote(el){el.textContent='';el.className='notice'}function safe(v){return v?String(v):'Non précisé'}function fmt(d){return d?new Date(d+'T00:00:00').toLocaleDateString('fr-FR'):'Non précisé'}
-function showPage(id){pages.forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.menu button[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===id));mainMenu.classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
-function updateDashboard(){const full=currentProfile?.full_name||currentUser?.email||'utilisateur',role=currentProfile?.role||'consultation',label=roleName(role),txt=roleDescriptions[role]||'Votre accès est actif.';userEmail.textContent=currentUser?.email||'Non disponible';userName.textContent=currentProfile?.full_name||'Non configuré';userRole.textContent=label;profileGreeting.textContent='Bonjour '+full;profileAccessText.textContent='Votre statut est : '+label+'. '+txt;profileBadge.textContent=label;dashboardTitle.textContent='Bienvenue '+full+'.';dashboardSubtitle.textContent=txt;if(canManagePatients()){patientFormPanel.classList.remove('hidden');patientPermissionText.textContent='Vous pouvez créer une fiche, corriger les informations générales et ajouter une nouvelle consultation.'}else{patientFormPanel.classList.add('hidden');consultationFormPanel.classList.add('hidden');patientPermissionText.textContent='Votre statut permet uniquement la recherche et la consultation.'}}
-async function loadProfile(user){currentUser=user;currentProfile={full_name:'',role:'consultation'};const {data,error}=await supabaseClient.from('profiles').select('full_name, role').eq('id',user.id).maybeSingle();if(!error&&data)currentProfile={full_name:data.full_name||'',role:data.role||'consultation'};updateDashboard()}
-async function verifySession(){if(!isConfigured)return;const {data,error}=await supabaseClient.auth.getUser();if(error||!data.user){document.body.classList.remove('is-authenticated');return}document.body.classList.add('is-authenticated');await loadProfile(data.user);showPage('dashboard')}
-async function signOut(){if(!isConfigured){showPage('login');note(loginNotice,'L’accès n’est pas encore configuré.');return}await supabaseClient.auth.signOut();document.body.classList.remove('is-authenticated');currentUser=null;currentProfile=null;selectedPatient=null;showPage('login');note(loginNotice,'Vous êtes déconnecté.','ok')}
-function resetPatientForm(){patientForm.reset();editingPatientId.value='';patientFormTitle.textContent='Créer une fiche patient';patientFormDescription.textContent='Enregistrez les informations générales. Les consultations seront ajoutées dans l’historique.';patientSubmit.textContent='Enregistrer la fiche';cancelPatientEdit.style.display='none';clearNote(patientNotice)}
-function fillPatientForm(p){if(!canManagePatients())return;editingPatientId.value=p.id;$('patientName').value=p.patient_name||'';$('birthDate').value=p.birth_date||'';$('gender').value=p.gender||'';$('phone').value=p.phone||'';$('address').value=p.address||'';patientFormTitle.textContent='Corriger les informations du patient';patientFormDescription.textContent='Corrigez uniquement les informations générales. Les consultations restent conservées.';patientSubmit.textContent='Enregistrer la correction';cancelPatientEdit.style.display='inline-flex';patientFormPanel.classList.remove('hidden');patientFormPanel.scrollIntoView({behavior:'smooth'})}
-async function savePatient(e){e.preventDefault();clearNote(patientNotice);if(!currentUser){note(patientNotice,'Veuillez vous connecter avant d’enregistrer.','error');return}if(!canManagePatients()){note(patientNotice,'Votre statut ne permet pas cette action.','error');return}const payload={patient_name:$('patientName').value.trim(),birth_date:$('birthDate').value||null,gender:$('gender').value||null,phone:$('phone').value.trim()||null,address:$('address').value.trim()||null,created_by:currentUser.id,updated_by:currentUser.id,updated_by_name:currentProfile?.full_name||currentUser.email};if(!payload.patient_name){note(patientNotice,'Veuillez compléter le nom du patient.','error');return}patientSubmit.disabled=true;patientSubmit.textContent=editingPatientId.value?'Correction...':'Enregistrement...';let res;if(editingPatientId.value){res=await supabaseClient.from('patients').update({patient_name:payload.patient_name,birth_date:payload.birth_date,gender:payload.gender,phone:payload.phone,address:payload.address,updated_by:payload.updated_by,updated_by_name:payload.updated_by_name}).eq('id',editingPatientId.value).select().single()}else{res=await supabaseClient.from('patients').insert(payload).select().single()}patientSubmit.disabled=false;patientSubmit.textContent=editingPatientId.value?'Enregistrer la correction':'Enregistrer la fiche';if(res.error){note(patientNotice,'L’enregistrement n’a pas abouti. Vérifiez les droits et les tables.','error');return}note(patientNotice,editingPatientId.value?'Les informations ont été corrigées.':'La fiche a été créée. Vous pouvez ajouter une consultation.','ok');selectedPatient=res.data;resetPatientForm();openPatientDetails(res.data);if(patientSearch.value.trim())searchPatients()}
-function showConsultationForm(p){if(!canManagePatients())return;selectedPatient=p;consultationPatientId.value=p.id;selectedPatientLabel.textContent='Patient sélectionné : '+p.patient_name;$('consultationDate').valueAsDate=new Date();$('doctorName').value='';$('consultationSummary').value='';consultationFormPanel.classList.remove('hidden');clearNote(consultationNotice);consultationFormPanel.scrollIntoView({behavior:'smooth'})}
-async function saveConsultation(e){e.preventDefault();clearNote(consultationNotice);if(!currentUser||!selectedPatient){note(consultationNotice,'Sélectionnez d’abord un patient.','error');return}if(!canManagePatients()){note(consultationNotice,'Votre statut ne permet pas d’ajouter une consultation.','error');return}const payload={patient_id:consultationPatientId.value,consultation_date:$('consultationDate').value,doctor_name:$('doctorName').value.trim(),consultation_summary:$('consultationSummary').value.trim(),recorded_by:currentUser.id,recorded_by_name:currentProfile?.full_name||currentUser.email};if(!payload.consultation_date||!payload.doctor_name||!payload.consultation_summary){note(consultationNotice,'Complétez la date, le praticien et le résumé.','error');return}consultationSubmit.disabled=true;consultationSubmit.textContent='Ajout...';const {error}=await supabaseClient.from('patient_consultations').insert(payload);consultationSubmit.disabled=false;consultationSubmit.textContent='Ajouter la consultation';if(error){note(consultationNotice,'La consultation n’a pas été enregistrée. Vérifiez les droits et les tables.','error');return}note(consultationNotice,'La consultation a été ajoutée à l’historique.','ok');consultationForm.reset();$('consultationDate').valueAsDate=new Date();await loadConsultations(selectedPatient.id)}
-async function searchPatients(){clearNote(searchNotice);patientResults.innerHTML='';patientDetailsPanel.classList.add('hidden');const term=patientSearch.value.trim();if(!term){note(searchNotice,'Entrez au moins une partie du nom du patient.');return}searchButton.disabled=true;searchButton.textContent='Recherche...';const {data,error}=await supabaseClient.from('patients').select('id, patient_name, birth_date, gender, phone, address, created_at, updated_at, updated_by_name').ilike('patient_name','%'+term+'%').order('created_at',{ascending:false}).limit(20);searchButton.disabled=false;searchButton.textContent='Rechercher';if(error){note(searchNotice,'La recherche n’a pas abouti. Vérifiez les tables.','error');return}lastPatientResults=data||[];renderPatients(lastPatientResults)}
-function renderPatients(list){patientResults.innerHTML='';if(!list.length){note(searchNotice,'Aucune fiche ne correspond à cette recherche.');return}clearNote(searchNotice);list.forEach(p=>{const el=document.createElement('article');el.className='result';el.innerHTML=`<h4>${safe(p.patient_name)}</h4><div class="meta"><div><span>Date de naissance</span><strong>${fmt(p.birth_date)}</strong></div><div><span>Téléphone</span><strong>${safe(p.phone)}</strong></div></div><div class="patientActions"><button class="btn soft" type="button" data-open="${p.id}">Ouvrir le dossier</button>${canManagePatients()?`<button class="btn soft" type="button" data-add="${p.id}">Ajouter une consultation</button>`:''}</div>`;patientResults.appendChild(el)});document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const p=lastPatientResults.find(x=>x.id===b.dataset.open);if(p)openPatientDetails(p)});document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{const p=lastPatientResults.find(x=>x.id===b.dataset.add);if(p){openPatientDetails(p);showConsultationForm(p)}})}
-async function openPatientDetails(p){selectedPatient=p;detailsPatientName.textContent='Dossier de '+p.patient_name;detailsPatientInfo.innerHTML=`<div class="meta"><div><span>Date de naissance</span><strong>${fmt(p.birth_date)}</strong></div><div><span>Sexe</span><strong>${safe(p.gender)}</strong></div><div><span>Téléphone</span><strong>${safe(p.phone)}</strong></div><div><span>Adresse</span><strong>${safe(p.address)}</strong></div><div><span>Fiche créée le</span><strong>${new Date(p.created_at).toLocaleDateString('fr-FR')}</strong></div><div><span>Dernière correction</span><strong>${safe(p.updated_by_name)}</strong></div></div>`;detailsActions.innerHTML=canManagePatients()?`<button class="btn soft" type="button" id="editPatientButton">Corriger les informations</button><button class="btn soft" type="button" id="addConsultationButton">Ajouter une consultation</button>`:'';patientDetailsPanel.classList.remove('hidden');if(canManagePatients()){$('editPatientButton').onclick=()=>fillPatientForm(p);$('addConsultationButton').onclick=()=>showConsultationForm(p)}await loadConsultations(p.id);patientDetailsPanel.scrollIntoView({behavior:'smooth'})}
-async function loadConsultations(patientId){consultationList.innerHTML='<div class="notice show warn">Chargement des consultations...</div>';const {data,error}=await supabaseClient.from('patient_consultations').select('id, consultation_date, doctor_name, consultation_summary, recorded_by_name, created_at').eq('patient_id',patientId).order('consultation_date',{ascending:false}).order('created_at',{ascending:false});if(error){consultationList.innerHTML='<div class="notice show error">Impossible de charger l’historique.</div>';return}if(!data||!data.length){consultationList.innerHTML='<div class="notice show warn">Aucune consultation n’est encore enregistrée.</div>';return}consultationList.innerHTML='';data.forEach((c,i)=>{const el=document.createElement('article');el.className='consult';el.innerHTML=`<header><div><h5>Consultation ${data.length-i}</h5><small>Date : ${fmt(c.consultation_date)}</small></div><small>Enregistrée le ${new Date(c.created_at).toLocaleDateString('fr-FR')}</small></header><div class="meta"><div><span>Praticien consulté</span><strong>${safe(c.doctor_name)}</strong></div><div><span>Enregistré par</span><strong>${safe(c.recorded_by_name)}</strong></div></div><div class="summary">${safe(c.consultation_summary)}</div>`;consultationList.appendChild(el)})}
-navButtons.forEach(b=>b.onclick=e=>{e.preventDefault();const id=b.dataset.page;if(id==='dashboard'&&!document.body.classList.contains('is-authenticated')){showPage('login');note(loginNotice,'Veuillez vous connecter avant d’accéder au tableau de bord.');return}if(id)showPage(id)});mobileToggle.onclick=()=>mainMenu.classList.toggle('open');togglePassword.onclick=()=>{const h=passwordInput.type==='password';passwordInput.type=h?'text':'password';togglePassword.textContent=h?'Cacher':'Voir'};logoutButton.onclick=signOut;dashboardLogout.onclick=signOut;patientForm.onsubmit=savePatient;consultationForm.onsubmit=saveConsultation;cancelPatientEdit.onclick=resetPatientForm;searchButton.onclick=searchPatients;patientSearch.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();searchPatients()}};
-loginForm.onsubmit=async e=>{e.preventDefault();clearNote(loginNotice);if(!isConfigured){note(loginNotice,'L’accès n’est pas encore configuré.');return}const email=$('email').value.trim(),password=$('password').value.trim();if(!email||!password){note(loginNotice,'Veuillez compléter l’adresse email et le mot de passe.','error');return}loginSubmit.disabled=true;loginSubmit.textContent='Vérification...';const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});loginSubmit.disabled=false;loginSubmit.textContent='Connexion';if(error){note(loginNotice,'Connexion refusée. Vérifiez l’adresse email et le mot de passe.','error');return}if(data.user){document.body.classList.add('is-authenticated');await loadProfile(data.user);loginForm.reset();showPage('dashboard')}};
-if(!isConfigured){showPage('login');note(loginNotice,'L’accès n’est pas encore configuré.')}else{verifySession();supabaseClient.auth.onAuthStateChange((_event,session)=>{if(!session)document.body.classList.remove('is-authenticated')})}
-</script>
+  <div id="configWarning" class="config-warning">
+    La connexion Supabase n'est pas encore configurée. Remplace SUPABASE_URL et SUPABASE_PUBLISHABLE_KEY dans le script de configuration.
+  </div>
+
+  <div id="publicArea">
+    <header class="topbar">
+      <a class="brand" href="#presentation">
+        <span class="brand-mark">THC</span>
+        <span>TRINITY HEALTH CARE</span>
+      </a>
+      <nav class="topnav">
+        <a href="#presentation">Accueil</a>
+        <a href="#securite">Accès sécurisé</a>
+        <a class="nav-login" href="#login">Se connecter</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="presentation">
+        <div class="hero-content">
+          <span class="kicker">Gestion numérique des dossiers patients</span>
+          <h1>Un espace sécurisé pour le suivi interne des patients.</h1>
+          <p>
+            TRINITY HEALTH CARE utilise un système organisé pour enregistrer les fiches patients,
+            retrouver rapidement les dossiers et conserver l'historique des consultations.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#login">Accéder à l'espace sécurisé</a>
+            <a class="btn btn-secondary" href="#securite">Conditions d'accès</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <h2>Fonctions principales</h2>
+          <ul class="clean-list">
+            <li>Création de fiches patients</li>
+            <li>Recherche par nom, téléphone ou code patient</li>
+            <li>Historique des consultations</li>
+            <li>Accès réservé au personnel autorisé</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="section" id="securite">
+        <div class="section-heading">
+          <span class="kicker">Confidentialité</span>
+          <h2>Les données sont protégées par l'authentification et les règles Supabase.</h2>
+          <p>
+            Chaque utilisateur doit avoir son propre compte. Les accès sont limités selon le rôle attribué
+            dans la base de données.
+          </p>
+        </div>
+        <div class="feature-grid">
+          <article class="info-card">
+            <h3>Administrateur</h3>
+            <p>Gère les accès, les rôles et supervise l'utilisation du système.</p>
+          </article>
+          <article class="info-card">
+            <h3>Médecin</h3>
+            <p>Consulte les fiches patients et ajoute les consultations médicales.</p>
+          </article>
+          <article class="info-card">
+            <h3>Réceptionniste</h3>
+            <p>Crée les fiches patients et effectue les recherches de dossiers.</p>
+          </article>
+          <article class="info-card">
+            <h3>Infirmier</h3>
+            <p>Accède aux informations utiles selon les autorisations définies.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="login-section" id="login">
+        <div class="login-card">
+          <div>
+            <span class="kicker">Connexion du personnel</span>
+            <h2>Accès au tableau de bord</h2>
+            <p>Entrez les identifiants fournis par l'administrateur.</p>
+          </div>
+
+          <form id="loginForm" class="form-card">
+            <label>
+              Adresse email
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </label>
+
+            <label>
+              Mot de passe
+              <div class="password-row">
+                <input id="password" name="password" type="password" autocomplete="current-password" required>
+                <button id="passwordToggle" type="button">Voir</button>
+              </div>
+            </label>
+
+            <button class="btn btn-primary full" type="submit">Se connecter</button>
+            <div id="loginNotice" class="notice"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>TRINITY HEALTH CARE - Espace interne de gestion des dossiers patients.</p>
+    </footer>
+  </div>
+
+  <div id="appArea" class="app-shell hidden">
+    <aside id="sidebar" class="sidebar">
+      <a class="brand admin-brand" href="#">
+        <span class="brand-mark">THC</span>
+        <span>Dossiers patients</span>
+      </a>
+
+      <nav class="side-nav">
+        <button type="button" data-view="dashboard" class="active">Tableau de bord</button>
+        <button type="button" data-view="patients">Rechercher un patient</button>
+        <button type="button" data-view="addPatient">Ajouter un patient</button>
+      </nav>
+
+      <div class="user-box">
+        <strong id="userName">Utilisateur</strong>
+        <span id="userRole">Rôle</span>
+        <button id="logoutButton" type="button" class="btn btn-secondary full">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="mobile-admin-bar">
+        <button id="openMenuButton" type="button" class="btn btn-secondary btn-small">Menu</button>
+        <strong>TRINITY HEALTH CARE</strong>
+      </div>
+
+      <div class="admin-main">
+        <section id="viewDashboard" class="app-view active">
+          <div class="page-head">
+            <span class="kicker">Vue générale</span>
+            <h1>Tableau de bord</h1>
+            <p>Suivi rapide des patients et des consultations enregistrées.</p>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span>Patients enregistrés</span>
+              <strong id="totalPatients">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Consultations</span>
+              <strong id="totalConsultations">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Utilisateur connecté</span>
+              <strong id="connectedRole">-</strong>
+            </article>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Derniers patients ajoutés</h2>
+              <button class="btn btn-small" type="button" data-view="patients">Voir la liste</button>
+            </div>
+            <div id="recentPatients" class="list-stack"></div>
+          </section>
+        </section>
+
+        <section id="viewPatients" class="app-view">
+          <div class="page-head">
+            <span class="kicker">Recherche patient</span>
+            <h1>Rechercher une fiche</h1>
+            <p>Recherchez par nom, postnom, prénom, téléphone, adresse ou code patient.</p>
+          </div>
+
+          <div class="search-box">
+            <input id="searchInput" type="search" placeholder="Exemple : THC-2026-000001, nom, téléphone">
+          </div>
+
+          <div id="patientsList" class="patients-list"></div>
+        </section>
+
+        <section id="viewAddPatient" class="app-view">
+          <div class="page-head">
+            <span class="kicker">Nouvelle fiche</span>
+            <h1>Ajouter un patient</h1>
+            <p>Enregistrez les informations de base. Les consultations seront ajoutées dans la fiche du patient.</p>
+          </div>
+
+          <form id="patientForm" class="form-grid panel">
+            <h2>Identité du patient</h2>
+            <label>Nom<input name="nom" required></label>
+            <label>Postnom<input name="postnom"></label>
+            <label>Prénom<input name="prenom"></label>
+            <label>Sexe
+              <select name="sexe" required>
+                <option value="">Sélectionner</option>
+                <option value="Masculin">Masculin</option>
+                <option value="Féminin">Féminin</option>
+              </select>
+            </label>
+            <label>Date de naissance<input name="date_naissance" type="date" required></label>
+            <label>Téléphone<input name="telephone"></label>
+            <label class="wide">Adresse<input name="adresse"></label>
+            <label>Personne à contacter<input name="emergency_contact_name"></label>
+            <label>Téléphone du contact<input name="emergency_contact_phone"></label>
+
+            <h2 class="wide">Résumé médical de base</h2>
+            <label>Groupe sanguin
+              <select name="groupe_sanguin">
+                <option value="">Non renseigné</option>
+                <option>A+</option><option>A-</option>
+                <option>B+</option><option>B-</option>
+                <option>AB+</option><option>AB-</option>
+                <option>O+</option><option>O-</option>
+              </select>
+            </label>
+            <label class="wide">Allergies<textarea name="allergies"></textarea></label>
+            <label class="wide">Antécédents<textarea name="antecedents"></textarea></label>
+            <label class="wide">Maladie connue<textarea name="maladie_connue"></textarea></label>
+            <label class="wide">Résumé médical<textarea name="resume_medical"></textarea></label>
+
+            <div class="wide actions-end">
+              <button class="btn btn-primary" type="submit">Enregistrer le patient</button>
+            </div>
+            <div id="patientNotice" class="notice wide"></div>
+          </form>
+        </section>
+
+        <section id="viewPatientFile" class="app-view">
+          <div class="page-head split-head">
+            <div>
+              <span class="kicker">Fiche patient</span>
+              <h1 id="filePatientName">Patient</h1>
+              <p id="filePatientCode">Code patient</p>
+            </div>
+            <button class="btn btn-secondary" type="button" data-view="patients">Retour à la recherche</button>
+          </div>
+
+          <div class="file-grid">
+            <section class="panel">
+              <h2>Informations générales</h2>
+              <div id="filePatientIdentity" class="details-grid"></div>
+            </section>
+
+            <section class="panel">
+              <h2>Résumé médical</h2>
+              <div id="fileMedicalRecord" class="details-grid"></div>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Dernières consultations</h2>
+              <span id="consultationRoleNotice" class="small-text"></span>
+            </div>
+            <div id="consultationsList" class="timeline"></div>
+          </section>
+
+          <form id="consultationForm" class="form-grid panel">
+            <h2>Ajouter une consultation</h2>
+            <label>Service consulté
+              <select name="service_consulte">
+                <option value="">Sélectionner</option>
+                <option>Consultation générale</option>
+                <option>Médecine générale</option>
+                <option>Pédiatrie</option>
+                <option>Gynécologie</option>
+                <option>Laboratoire</option>
+                <option>Imagerie médicale</option>
+                <option>Soins infirmiers</option>
+                <option>Urgences</option>
+              </select>
+            </label>
+            <label class="wide">Motif de consultation<textarea name="motif" required></textarea></label>
+            <label class="wide">Diagnostic<textarea name="diagnostic"></textarea></label>
+            <label class="wide">Traitement<textarea name="traitement"></textarea></label>
+            <label class="wide">Observations<textarea name="observations"></textarea></label>
+            <label>Résultat final
+              <select name="resultat_final">
+                <option value="">Sélectionner</option>
+                <option>Prescription remise</option>
+                <option>Suivi recommandé</option>
+                <option>Rendez-vous programmé</option>
+                <option>Examen demandé</option>
+                <option>Orientation vers un spécialiste</option>
+              </select>
+            </label>
+            <div class="wide actions-end">
+              <button class="btn btn-primary" type="submit">Enregistrer la consultation</button>
+            </div>
+            <div id="consultationNotice" class="notice wide"></div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    /*
+      MODIFICATION OBLIGATOIRE :
+      1. Va dans Supabase > Project Settings > API Keys.
+      2. Copie Project URL.
+      3. Copie Publishable key, ou Anon key si ton tableau affiche encore l'ancien nom.
+      4. Remplace les deux valeurs ci-dessous.
+    */
+    const SUPABASE_URL = "https://giqsbegnmnoeekfitleh.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YhLLVce-5RHhOc2kXdoELA_w-VQhbNa";
+  </script>
+  <script>
+    let supabaseClient = null;
+    let currentUser = null;
+    let currentProfile = null;
+    let patients = [];
+    let selectedPatient = null;
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function isConfigured() {
+      return SUPABASE_URL &&
+        SUPABASE_PUBLISHABLE_KEY &&
+        !SUPABASE_URL.includes("TON-PROJET") &&
+        !SUPABASE_PUBLISHABLE_KEY.includes("TA_CLE");
+    }
+
+    function initSupabase() {
+      if (!isConfigured()) {
+        $("#configWarning").classList.add("active");
+        return false;
+      }
+
+      if (!window.supabase) {
+        $("#configWarning").textContent = "La librairie Supabase n'a pas pu être chargée. Vérifie la connexion internet ou le lien CDN.";
+        $("#configWarning").classList.add("active");
+        return false;
+      }
+
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      return true;
+    }
+
+    const views = {
+      dashboard: () => $("#viewDashboard"),
+      patients: () => $("#viewPatients"),
+      addPatient: () => $("#viewAddPatient"),
+      patientFile: () => $("#viewPatientFile")
+    };
+
+    function setNotice(target, message, type = "info") {
+      const element = typeof target === "string" ? $(target) : target;
+      if (!element) return;
+      element.textContent = message;
+      element.className = `notice ${type}`;
+    }
+
+    function showPublic() {
+      $("#publicArea").classList.remove("hidden");
+      $("#appArea").classList.add("hidden");
+      document.body.classList.remove("lock-scroll");
+    }
+
+    function showApp() {
+      $("#publicArea").classList.add("hidden");
+      $("#appArea").classList.remove("hidden");
+    }
+
+    function closeMenu() {
+      $("#sidebar").classList.remove("open");
+      document.body.classList.remove("lock-scroll");
+    }
+
+    function showView(name) {
+      Object.keys(views).forEach((key) => {
+        const view = views[key]();
+        if (view) view.classList.toggle("active", key === name);
+      });
+
+      $$("[data-view]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === name);
+      });
+
+      closeMenu();
+    }
+
+    function formatDate(value) {
+      if (!value) return "Non renseigné";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString("fr-FR");
+    }
+
+    function calculateAge(birthDate) {
+      if (!birthDate) return "Non renseigné";
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDifference = today.getMonth() - birth.getMonth();
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return `${age} ans`;
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function fullName(patient) {
+      return [patient.nom, patient.postnom, patient.prenom].filter(Boolean).join(" ");
+    }
+
+    function userCanCreatePatient() {
+      return ["admin", "receptionniste", "medecin"].includes(currentProfile?.role);
+    }
+
+    function userCanCreateConsultation() {
+      return ["admin", "medecin", "infirmier"].includes(currentProfile?.role);
+    }
+
+    async function checkExistingSession() {
+      if (!supabaseClient) return;
+
+      const { data } = await supabaseClient.auth.getSession();
+      if (data.session?.user) {
+        await loadAuthenticatedUser();
+      }
+    }
+
+    async function loadAuthenticatedUser() {
+      const { data, error } = await supabaseClient.auth.getUser();
+
+      if (error || !data.user) {
+        showPublic();
+        return false;
+      }
+
+      currentUser = data.user;
+
+      const { data: profile, error: profileError } = await supabaseClient
+        .from("profiles")
+        .select("id, full_name, email, role, status")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        alert("Compte connecté, mais profil utilisateur absent. Vérifie la table profiles.");
+        await supabaseClient.auth.signOut();
+        showPublic();
+        return false;
+      }
+
+      if (profile.status !== "active") {
+        alert("Ce compte est désactivé.");
+        await supabaseClient.auth.signOut();
+        showPublic();
+        return false;
+      }
+
+      currentProfile = profile;
+      applyRolePermissions();
+      $("#userName").textContent = profile.full_name || profile.email || currentUser.email;
+      $("#userRole").textContent = profile.role;
+      $("#connectedRole").textContent = profile.role;
+      $("#consultationRoleNotice").textContent = userCanCreateConsultation()
+        ? "Vous pouvez ajouter une consultation pour ce patient."
+        : "Votre rôle permet de consulter le dossier, mais pas d'ajouter une consultation.";
+
+      if (!userCanCreatePatient()) {
+        const addButton = document.querySelector('[data-view="addPatient"]');
+        if (addButton) addButton.classList.add("hidden");
+      }
+
+      showApp();
+      await loadPatients();
+      showView("dashboard");
+      return true;
+    }
+
+    async function login(email, password) {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      return data.user;
+    }
+
+    async function signOut() {
+      if (supabaseClient) await supabaseClient.auth.signOut();
+      currentUser = null;
+      currentProfile = null;
+      patients = [];
+      selectedPatient = null;
+      showPublic();
+      window.location.hash = "login";
+    }
+
+    async function loadPatients() {
+      const { data, error } = await supabaseClient
+        .from("patients")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      patients = data || [];
+      renderPatients(patients);
+      await renderDashboard();
+    }
+
+    async function loadConsultations(patientId) {
+      const { data, error } = await supabaseClient
+        .from("consultations")
+        .select("*, profiles:user_id(full_name, role)")
+        .eq("patient_id", patientId)
+        .order("date_consultation", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function loadMedicalRecord(patientId) {
+      const { data, error } = await supabaseClient
+        .from("medical_records")
+        .select("*")
+        .eq("patient_id", patientId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    }
+
+    async function renderDashboard() {
+      $("#totalPatients").textContent = patients.length;
+
+      const { count } = await supabaseClient
+        .from("consultations")
+        .select("id", { count: "exact", head: true });
+
+      $("#totalConsultations").textContent = count || 0;
+
+      const recentList = $("#recentPatients");
+      recentList.innerHTML = patients.slice(0, 5).map((patient) => `
+        <button class="patient-line" type="button" data-open-patient="${escapeHtml(patient.id)}">
+          <span>${escapeHtml(fullName(patient))}</span>
+          <small>${escapeHtml(patient.code_patient)} · ${formatDate(patient.created_at)}</small>
+        </button>
+      `).join("") || "<p class='empty'>Aucun patient enregistré.</p>";
+    }
+
+    function renderPatients(list) {
+      const container = $("#patientsList");
+
+      if (!list.length) {
+        container.innerHTML = "<p class='empty'>Aucun patient trouvé.</p>";
+        return;
+      }
+
+      container.innerHTML = list.map((patient) => `
+        <article class="patient-card">
+          <div class="avatar">${escapeHtml((patient.nom || "P").charAt(0).toUpperCase())}</div>
+          <div>
+            <h3>${escapeHtml(fullName(patient))}</h3>
+            <p>${escapeHtml(patient.code_patient)} · ${escapeHtml(patient.sexe)} · ${formatDate(patient.date_naissance)}</p>
+            <p>${escapeHtml(patient.telephone || "Téléphone non renseigné")}</p>
+          </div>
+          <button class="btn btn-small" type="button" data-open-patient="${escapeHtml(patient.id)}">Ouvrir</button>
+        </article>
+      `).join("");
+    }
+
+    function searchPatients(query) {
+      const value = query.trim().toLowerCase();
+      if (!value) {
+        renderPatients(patients);
+        return;
+      }
+
+      const result = patients.filter((patient) => {
+        const text = [
+          patient.code_patient,
+          patient.nom,
+          patient.postnom,
+          patient.prenom,
+          patient.telephone,
+          patient.adresse
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        return text.includes(value);
+      });
+
+      renderPatients(result);
+    }
+
+    async function openPatient(patientId) {
+      const { data: patient, error } = await supabaseClient
+        .from("patients")
+        .select("*")
+        .eq("id", patientId)
+        .single();
+
+      if (error) {
+        alert("Impossible d'ouvrir la fiche patient.");
+        return;
+      }
+
+      selectedPatient = patient;
+      const record = await loadMedicalRecord(patient.id);
+      const consultations = await loadConsultations(patient.id);
+
+      $("#filePatientName").textContent = fullName(patient);
+      $("#filePatientCode").textContent = patient.code_patient;
+      $("#filePatientIdentity").innerHTML = `
+        <div><strong>Sexe</strong><span>${escapeHtml(patient.sexe)}</span></div>
+        <div><strong>Date de naissance</strong><span>${formatDate(patient.date_naissance)}</span></div>
+        <div><strong>Âge</strong><span>${calculateAge(patient.date_naissance)}</span></div>
+        <div><strong>Téléphone</strong><span>${escapeHtml(patient.telephone || "Non renseigné")}</span></div>
+        <div><strong>Adresse</strong><span>${escapeHtml(patient.adresse || "Non renseignée")}</span></div>
+        <div><strong>Contact d'urgence</strong><span>${escapeHtml(patient.emergency_contact_name || "Non renseigné")} ${patient.emergency_contact_phone ? "· " + escapeHtml(patient.emergency_contact_phone) : ""}</span></div>
+      `;
+
+      $("#fileMedicalRecord").innerHTML = `
+        <div><strong>Groupe sanguin</strong><span>${escapeHtml(record?.groupe_sanguin || "Non renseigné")}</span></div>
+        <div><strong>Allergies</strong><span>${escapeHtml(record?.allergies || "Aucune information enregistrée")}</span></div>
+        <div><strong>Antécédents</strong><span>${escapeHtml(record?.antecedents || "Aucune information enregistrée")}</span></div>
+        <div><strong>Maladie connue</strong><span>${escapeHtml(record?.maladie_connue || "Aucune information enregistrée")}</span></div>
+        <div><strong>Résumé médical</strong><span>${escapeHtml(record?.resume_medical || "Aucun résumé enregistré")}</span></div>
+      `;
+
+      renderConsultations(consultations);
+      $("#consultationForm").classList.toggle("hidden", !userCanCreateConsultation());
+      showView("patientFile");
+    }
+
+    function renderConsultations(consultations) {
+      const container = $("#consultationsList");
+
+      if (!consultations.length) {
+        container.innerHTML = "<p class='empty'>Aucune consultation enregistrée pour ce patient.</p>";
+        return;
+      }
+
+      container.innerHTML = consultations.map((consultation) => `
+        <article class="timeline-item">
+          <div class="timeline-date">${formatDate(consultation.date_consultation)}</div>
+          <h3>${escapeHtml(consultation.motif || "Consultation")}</h3>
+          <p><strong>Service consulté :</strong> ${escapeHtml(consultation.service_consulte || "Non renseigné")}</p>
+          <p><strong>Diagnostic :</strong> ${escapeHtml(consultation.diagnostic || "Non renseigné")}</p>
+          <p><strong>Traitement :</strong> ${escapeHtml(consultation.traitement || "Non renseigné")}</p>
+          <p><strong>Observations :</strong> ${escapeHtml(consultation.observations || "Non renseigné")}</p>
+          <p><strong>Résultat final :</strong> ${escapeHtml(consultation.resultat_final || "Non renseigné")}</p>
+          <p class="small-text">Enregistré par : ${escapeHtml(consultation.profiles?.full_name || "Personnel médical")}</p>
+        </article>
+      `).join("");
+    }
+
+    async function createPatient(formData) {
+      const patientPayload = {
+        nom: formData.get("nom")?.trim(),
+        postnom: formData.get("postnom")?.trim() || null,
+        prenom: formData.get("prenom")?.trim() || null,
+        sexe: formData.get("sexe"),
+        date_naissance: formData.get("date_naissance"),
+        telephone: formData.get("telephone")?.trim() || null,
+        adresse: formData.get("adresse")?.trim() || null,
+        emergency_contact_name: formData.get("emergency_contact_name")?.trim() || null,
+        emergency_contact_phone: formData.get("emergency_contact_phone")?.trim() || null,
+        created_by: currentUser.id
+      };
+
+      const { data: patient, error: patientError } = await supabaseClient
+        .from("patients")
+        .insert(patientPayload)
+        .select()
+        .single();
+
+      if (patientError) throw patientError;
+
+      const medicalPayload = {
+        patient_id: patient.id,
+        groupe_sanguin: formData.get("groupe_sanguin") || null,
+        allergies: formData.get("allergies")?.trim() || null,
+        antecedents: formData.get("antecedents")?.trim() || null,
+        maladie_connue: formData.get("maladie_connue")?.trim() || null,
+        resume_medical: formData.get("resume_medical")?.trim() || null
+      };
+
+      const { error: recordError } = await supabaseClient
+        .from("medical_records")
+        .insert(medicalPayload);
+
+      if (recordError) throw recordError;
+
+      await supabaseClient.from("audit_logs").insert({
+        user_id: currentUser.id,
+        action: "CREATE_PATIENT",
+        table_name: "patients",
+        record_id: patient.id,
+        patient_id: patient.id,
+        details: {
+          code_patient: patient.code_patient,
+          nom: patient.nom
+        }
+      });
+
+      return patient;
+    }
+
+    async function createConsultation(formData) {
+      if (!selectedPatient) throw new Error("Aucun patient sélectionné.");
+
+      const payload = {
+        patient_id: selectedPatient.id,
+        user_id: currentUser.id,
+        service_consulte: formData.get("service_consulte") || null,
+        motif: formData.get("motif")?.trim(),
+        diagnostic: formData.get("diagnostic")?.trim() || null,
+        traitement: formData.get("traitement")?.trim() || null,
+        observations: formData.get("observations")?.trim() || null,
+        resultat_final: formData.get("resultat_final") || null
+      };
+
+      const { data, error } = await supabaseClient
+        .from("consultations")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await supabaseClient.from("audit_logs").insert({
+        user_id: currentUser.id,
+        action: "CREATE_CONSULTATION",
+        table_name: "consultations",
+        record_id: data.id,
+        patient_id: selectedPatient.id,
+        details: {
+          motif: data.motif,
+          service_consulte: data.service_consulte
+        }
+      });
+
+      return data;
+    }
+
+    function bindEvents() {
+      $("#passwordToggle").addEventListener("click", () => {
+        const input = $("#password");
+        const isPassword = input.type === "password";
+        input.type = isPassword ? "text" : "password";
+        $("#passwordToggle").textContent = isPassword ? "Cacher" : "Voir";
+      });
+
+      $("#loginForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!supabaseClient) {
+          setNotice("#loginNotice", "Configure d'abord les clés Supabase dans le fichier HTML.", "error");
+          return;
+        }
+
+        const email = $("#email").value.trim();
+        const password = $("#password").value;
+
+        setNotice("#loginNotice", "Connexion en cours...");
+
+        try {
+          await login(email, password);
+          setNotice("#loginNotice", "Connexion réussie.", "success");
+          await loadAuthenticatedUser();
+        } catch (error) {
+          setNotice("#loginNotice", "Email ou mot de passe incorrect.", "error");
+          console.error(error);
+        }
+      });
+
+      $("#logoutButton").addEventListener("click", signOut);
+
+      $("#openMenuButton").addEventListener("click", () => {
+        $("#sidebar").classList.add("open");
+        document.body.classList.add("lock-scroll");
+      });
+
+      document.addEventListener("click", (event) => {
+        const viewButton = event.target.closest("[data-view]");
+        if (viewButton) {
+          showView(viewButton.dataset.view);
+        }
+
+        const patientButton = event.target.closest("[data-open-patient]");
+        if (patientButton) {
+          openPatient(patientButton.dataset.openPatient);
+        }
+      });
+
+      $("#searchInput").addEventListener("input", (event) => {
+        searchPatients(event.target.value);
+      });
+
+      $("#patientForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!userCanCreatePatient()) {
+          setNotice("#patientNotice", "Votre rôle ne permet pas d'ajouter un patient.", "error");
+          return;
+        }
+
+        setNotice("#patientNotice", "Enregistrement en cours...");
+
+        try {
+          const form = event.currentTarget;
+const formData = new FormData(form);
+const patient = await createPatient(formData);
+form.reset();
+          setNotice("#patientNotice", `Patient enregistré avec succès. Code : ${patient.code_patient}`, "success");
+          await loadPatients();
+          await openPatient(patient.id);
+        } catch (error) {
+          console.error(error);
+          setNotice("#patientNotice", `Erreur : ${error.message}`, "error");
+        }
+      });
+
+      $("#consultationForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!userCanCreateConsultation()) {
+          setNotice("#consultationNotice", "Votre rôle ne permet pas d'ajouter une consultation.", "error");
+          return;
+        }
+
+        setNotice("#consultationNotice", "Enregistrement en cours...");
+
+        try {
+          const form = event.currentTarget;
+const formData = new FormData(form);
+await createConsultation(formData);
+form.reset();
+          setNotice("#consultationNotice", "Consultation enregistrée avec succès.", "success");
+          const consultations = await loadConsultations(selectedPatient.id);
+          renderConsultations(consultations);
+          await renderDashboard();
+        } catch (error) {
+          console.error(error);
+          setNotice("#consultationNotice", `Erreur : ${error.message}`, "error");
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      bindEvents();
+      const ready = initSupabase();
+      if (ready) {
+        await checkExistingSession();
+      }
+    });
+  function applyRolePermissions() {
+  if (!currentProfile) return;
+
+  const role = currentProfile.role;
+
+  if (role === "consultation_seule") {
+    document.querySelectorAll(".can-create, .can-edit, .can-consultation")
+      .forEach(el => el.style.display = "none");
+  }
+}
+  </script>
 </body>
 </html>
